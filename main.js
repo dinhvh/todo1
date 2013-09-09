@@ -6,7 +6,7 @@ var task_id = 1;
 var focusEnabled = false;
 
 var setup = function() {
-  $('#add-button').text('Add Task');
+  $('#add-button').text('+');
   $('#add-button').click(function(event) {
     addTask(task_id, '');
     task_id ++;
@@ -40,6 +40,26 @@ var addTaskIfNeeded = function() {
   }
 };
 
+var animateRemoveCell = function(task_id) {
+  // start animation
+  var task = $('#task-' + task_id);
+  setTimeout(function() {
+   // move to left and fade
+    task.animate({
+      opacity: 0,
+      marginLeft: 200
+    }, 250, function() {
+      // collapse the cell
+      task.animate({
+        height: 0
+      }, 250, function() {
+        task.remove();
+        addTaskIfNeeded();
+      });
+    });
+  }, 500);
+};
+
 var addTask = function(task_id, title) {
   $('#list').append('<div class="task" id="task-' + task_id + '"><input type="checkbox"></input><input type="text" class="form-control" placeholder="New Task"></input></div>');
   scheduleSave();
@@ -60,6 +80,9 @@ var addTask = function(task_id, title) {
   
   var checkbox = $('#task-' + task_id + ' input[type=checkbox]');
   checkbox.change(function(the_task_id, event) {
+    if (checkbox[0].checked) {
+      animateRemoveCell(the_task_id);
+    }
     scheduleSave();
   }.bind(this, task_id));
 };
