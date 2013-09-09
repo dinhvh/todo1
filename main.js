@@ -7,15 +7,27 @@ var focusEnabled = false;
 
 var setup = function() {
   $('#add-button').text('Add Task');
+  $('#add-button').text('+');
   $('#add-button').click(function(event) {
     addTask(task_id, '');
     task_id ++;
+  });
+
+  chrome.syncFileSystem.onFileStatusChanged.addListener(function(detail) {
+    if (detail.direction == 'remote_to_local') {
+      console.log('remote change pushing');
+      $('#list').empty();
+      loadData(function() {
+        console.log($('.task'));
+        addTaskIfNeeded();
+        focusEnabled = true;
+      });
+    }
   });
   
   loadData(function() {
     console.log($('.task'));
     addTaskIfNeeded();
-    
     focusEnabled = true;
   });
 };
@@ -27,6 +39,24 @@ var addTaskIfNeeded = function() {
     var tasktitle = $('.task input[type=text]');
     tasktitle.blur();
   }
+};
+
+var animateRemoveCell = function(task_id) {
+  // start animation
+  var task = $('#task-' + task_id);
+  setTimeout(function() {
+    task.animate({
+      opacity: 0,
+      marginLeft: 200
+    }, 250, function() {
+      task.animate({
+        height: 0
+      }, 250, function() {
+        task.remove();
+        addTaskIfNeeded();
+      });
+    });
+  }, 500);
 };
 
 var addTask = function(task_id, title) {
@@ -49,6 +79,9 @@ var addTask = function(task_id, title) {
   
   var checkbox = $('#task-' + task_id + ' input[type=checkbox]');
   checkbox.change(function(the_task_id, event) {
+    if (checkbox[0].checked) {
+      animateRemoveCell(the_task_id);
+    }
     scheduleSave();
   }.bind(this, task_id));
 };
@@ -62,7 +95,7 @@ var scheduleSave = function() {
   
   scheduledSave = true;
   setTimeout(function() {
-    window.webkitRequestFileSystem(window.PERSISTENT, 5*1024*1024*1024, function(fs) {
+    chrome.syncFileSystem.requestFileSystem(function(fs) {
       fs.root.getFile('contents', {create: true}, function(createdEntry) {
         createdEntry.createWriter(function(writer) {
           var blob = new Blob([serializedData()], {type: 'text/plain'});
@@ -83,7 +116,7 @@ var scheduleSave = function() {
 };
 
 var loadData = function(callback) {
-  window.webkitRequestFileSystem(window.PERSISTENT, 5*1024*1024*1024, function(fs) {
+  chrome.syncFileSystem.requestFileSystem(function(fs) {
     fs.root.getFile('contents', {}, function(fileEntry) {
       fileEntry.file(function(file) {
         var reader = new FileReader();
