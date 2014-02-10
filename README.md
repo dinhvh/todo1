@@ -1,4 +1,4 @@
 chrome-todolist
 ===============
 
-Chrome Apps Todo-List
+Chrome Apps simple Todo-List
