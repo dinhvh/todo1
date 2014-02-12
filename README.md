@@ -2,4 +2,5 @@ chrome-todolist
 ===============
 
 Chrome Apps Todo-List
-sdfasfasd
+
+- show a todo list
