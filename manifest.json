@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "To-Dos",
-  "version": "14",
+  "version": "15",
   "minimum_chrome_version": "23",
   "icons": {
     "16": "icon_16.png",
