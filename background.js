@@ -3,11 +3,10 @@
  *
  * @see http://developer.chrome.com/trunk/apps/app.runtime.html
  * @see http://developer.chrome.com/trunk/apps/app.window.html
- * 
+ *
  * test
  */
 chrome.app.runtime.onLaunched.addListener(function() {
-  // Center window on screen.
   var screenWidth = screen.availWidth;
   var screenHeight = screen.availHeight;
   var width = 500;
